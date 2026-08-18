@@ -1,6 +1,7 @@
 import os
 import joblib
 import json
+from pathlib import Path
 from typing import Dict, Any, Optional
 from app.core.config import settings
 from app.core.logging import logger
@@ -17,26 +18,41 @@ class ModelLoader:
             cls._instance = super(ModelLoader, cls).__new__(cls)
         return cls._instance
 
+    def _find_model_directory(self) -> Path:
+        current_file = Path(__file__).resolve()
+        
+        candidates = [
+            Path(settings.MODEL_DIRECTORY),
+            current_file.parent.parent.parent / "trained_models",
+            current_file.parent.parent.parent.parent / "trained_models",
+            Path.cwd() / "trained_models",
+            Path.cwd() / "backend" / "trained_models",
+        ]
+
+        for cand in candidates:
+            if cand.exists() and cand.is_dir():
+                return cand
+
+        return Path(settings.MODEL_DIRECTORY)
+
     def load_all_models(self) -> None:
         """
-        Loads all production ML pipelines once during application startup.
+        Loads all 4 production ML pipelines once during application startup.
+        Uses cross-platform pathlib.Path resolution.
         """
         logger.info("Initializing ModelLoader singleton...")
         
-        # Base folder containing trained_models
-        base_dir = os.path.dirname(settings.MODEL_DIRECTORY)
-        if not os.path.exists(settings.MODEL_DIRECTORY):
-            # Fallback to local project trained_models directory
-            base_dir = r"c:\Users\amman\Downloads\New folder"
+        target_dir = self._find_model_directory()
+        logger.info(f"Targeting ML Model Directory: {target_dir}")
 
         for model_id, reg_info in MODEL_REGISTRY.items():
-            rel_model_path = reg_info["artifact_path"]
-            rel_meta_path = reg_info["metadata_path"]
+            rel_model_filename = os.path.basename(reg_info["artifact_path"])
+            rel_meta_filename = os.path.basename(reg_info["metadata_path"])
 
-            abs_model_path = os.path.join(base_dir, rel_model_path)
-            abs_meta_path = os.path.join(base_dir, rel_meta_path)
+            abs_model_path = target_dir / rel_model_filename
+            abs_meta_path = target_dir / rel_meta_filename
 
-            if not os.path.exists(abs_model_path):
+            if not abs_model_path.exists():
                 logger.error(f"❌ Model artifact file not found: {abs_model_path}")
                 self._loaded_status[model_id] = False
                 continue
@@ -45,7 +61,7 @@ class ModelLoader:
                 pipeline = joblib.load(abs_model_path)
                 self._models[model_id] = pipeline
                 
-                if os.path.exists(abs_meta_path):
+                if abs_meta_path.exists():
                     with open(abs_meta_path, 'r', encoding='utf-8') as f:
                         meta_data = json.load(f)
                     self._metadata[model_id] = meta_data

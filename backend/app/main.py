@@ -66,7 +66,7 @@ app.include_router(patient_analyze.router, prefix=api_prefix)
 app.include_router(appointments.router, prefix=api_prefix)
 app.include_router(admin.router, prefix=api_prefix)
 
-@app.get("/")
+@app.api_route("/", methods=["GET", "HEAD"])
 async def root():
     return {
         "service": settings.APP_NAME,
