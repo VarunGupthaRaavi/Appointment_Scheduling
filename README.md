@@ -88,9 +88,9 @@ npm run dev
    - **Build Command**: `pip install -r requirements.txt`
    - **Start Command**: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
 3. Add Environment Variables:
-   - `SUPABASE_URL=https://isfmahsyycgokjxtkppr.supabase.co`
-   - `SUPABASE_KEY=sb_publishable_1ftKFBtNRmxIbtwF9AQ4bA_RDeMN9vP`
-   - `DATABASE_URL=postgresql://postgres.isfmahsyycgokjxtkppr:Appointmnet143@aws-0-ap-northeast-1.pooler.supabase.com:5432/postgres`
+   - `SUPABASE_URL=https://your-project-id.supabase.co`
+   - `SUPABASE_KEY=your-supabase-key`
+   - `DATABASE_URL=postgresql://postgres.your-project-id:your-db-password@your-pooler-host:5432/postgres`
 
 ### Deploying Frontend on Vercel
 1. Import project into [Vercel](https://vercel.com).

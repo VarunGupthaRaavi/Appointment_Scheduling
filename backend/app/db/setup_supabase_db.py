@@ -1,8 +1,10 @@
 import os
 import psycopg2
 
-# Verified Active Supabase PostgreSQL Connection String
-DATABASE_URL = "postgresql://postgres.isfmahsyycgokjxtkppr:Appointmnet143@aws-0-ap-northeast-1.pooler.supabase.com:5432/postgres"
+DATABASE_URL = os.getenv(
+    "DATABASE_URL",
+    "postgresql://postgres.your-project:your-password@aws-0-ap-northeast-1.pooler.supabase.com:5432/postgres"
+)
 
 CREATE_TABLES_SQL = """
 -- 1. Appointments Table
@@ -80,7 +82,6 @@ def setup_database():
         conn.commit()
         print("SUCCESS: Successfully created Supabase tables ('appointments', 'system_users', 'prediction_logs')!")
         
-        # Verify created tables
         cursor.execute("SELECT table_name FROM information_schema.tables WHERE table_schema='public';")
         tables = [row[0] for row in cursor.fetchall()]
         print(f"Active Supabase Tables in 'public' schema: {tables}")
