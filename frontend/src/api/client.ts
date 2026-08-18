@@ -1,0 +1,87 @@
+import axios from 'axios';
+import { PredictionResult, ModelCardInfo, Appointment } from '../types';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1';
+
+export const apiClient = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+apiClient.interceptors.request.use((config) => {
+  const token = localStorage.getItem('careflow_token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+// ML Prediction Services
+export const predictDiabetes = async (data: Record<string, any>): Promise<PredictionResult> => {
+  const res = await apiClient.post<PredictionResult>('/predict/diabetes', data);
+  return res.data;
+};
+
+export const predictNoShow = async (data: Record<string, any>): Promise<PredictionResult> => {
+  const res = await apiClient.post<PredictionResult>('/predict/appointment-no-show', data);
+  return res.data;
+};
+
+export const predictReservation = async (data: Record<string, any>): Promise<PredictionResult> => {
+  const res = await apiClient.post<PredictionResult>('/predict/appointment-reservation', data);
+  return res.data;
+};
+
+export const predictReadmission = async (data: Record<string, any>): Promise<PredictionResult> => {
+  const res = await apiClient.post<PredictionResult>('/predict/readmission', data);
+  return res.data;
+};
+
+export const analyzePatientUnified = async (data: Record<string, any>) => {
+  const res = await apiClient.post('/patient/analyze', data);
+  return res.data;
+};
+
+// Admin & System APIs
+export const fetchAdminModels = async (): Promise<ModelCardInfo[]> => {
+  const res = await apiClient.get<{ models: ModelCardInfo[] }>('/admin/models');
+  return res.data.models;
+};
+
+export const fetchAdminAnalytics = async () => {
+  const res = await apiClient.get('/admin/analytics');
+  return res.data;
+};
+
+// Appointments API
+export const fetchAppointments = async (): Promise<Appointment[]> => {
+  const res = await apiClient.get<{ appointments: Appointment[] }>('/appointments');
+  return res.data.appointments;
+};
+
+export const checkSlotAvailability = async (date: string, time: string) => {
+  const res = await apiClient.get('/appointments/check-availability', {
+    params: { date, time }
+  });
+  return res.data;
+};
+
+export const createAppointment = async (data: Record<string, any>): Promise<Appointment> => {
+  const res = await apiClient.post('/appointments', data);
+  return res.data.appointment;
+};
+
+export const rescheduleAppointment = async (id: string, newDate: string, newTime: string) => {
+  const res = await apiClient.patch(`/appointments/${id}/reschedule`, {
+    new_date: newDate,
+    new_time: newTime
+  });
+  return res.data;
+};
+
+export const updateAppointmentStatus = async (id: string, status: string) => {
+  const res = await apiClient.patch(`/appointments/${id}`, { status });
+  return res.data;
+};

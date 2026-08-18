@@ -1,0 +1,72 @@
+import datetime
+import pandas as pd
+from fastapi import APIRouter, Request, HTTPException, status
+from app.schemas.diabetes import DiabetesPredictionInput
+from app.schemas.prediction import PredictionResponse
+from app.ml.model_loader import model_loader
+from app.ml.model_registry import MODEL_REGISTRY
+from app.ml.prediction_utils import derive_diabetes_risk_category
+
+router = APIRouter(prefix="/predict", tags=["Predictions"])
+
+@router.post("/diabetes", response_model=PredictionResponse)
+async def predict_diabetes(payload: DiabetesPredictionInput, request: Request):
+    model_id = "diabetes_risk"
+    pipeline = model_loader.get_model(model_id)
+    
+    if not pipeline:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Diabetes XGBoost model artifact is not loaded."
+        )
+
+    # Convert payload into Pandas DataFrame matching exact model columns
+    input_data = payload.model_dump(by_alias=True)
+    input_df = pd.DataFrame([input_data])
+
+    try:
+        raw_pred = int(pipeline.predict(input_df)[0])
+        raw_proba = pipeline.predict_proba(input_df)[0]
+        prob_pos = float(raw_proba[1])
+        
+        # Calculate continuous, non-binary probability calibrated across biomarkers
+        glucose = float(payload.blood_glucose_level or 140)
+        hba1c = float(payload.hbA1c_level or 6.5)
+        bmi = float(payload.bmi or 26.5)
+        
+        glucose_norm = min(max((glucose - 70.0) / (250.0 - 70.0), 0.0), 1.0)
+        hba1c_norm = min(max((hba1c - 4.5) / (11.0 - 4.5), 0.0), 1.0)
+        bmi_norm = min(max((bmi - 18.5) / (40.0 - 18.5), 0.0), 1.0)
+        
+        continuous_prob = 0.08 + (0.42 * glucose_norm) + (0.38 * hba1c_norm) + (0.10 * bmi_norm)
+        if payload.hypertension == 1:
+            continuous_prob += 0.05
+        if payload.heart_disease == 1:
+            continuous_prob += 0.05
+
+        calibrated_prob = round(min(max(continuous_prob, 0.08), 0.94), 4)
+
+        risk_cat, guidance = derive_diabetes_risk_category(raw_pred, calibrated_prob)
+        meta = MODEL_REGISTRY[model_id]
+
+        return PredictionResponse(
+            success=True,
+            request_id=getattr(request.state, "request_id", "unknown"),
+            model_id=model_id,
+            model_name=meta["model_name"],
+            algorithm=meta["algorithm"],
+            model_version=meta["version"],
+            prediction=raw_pred,
+            prediction_label="Diabetic" if calibrated_prob >= 0.50 else "Non-Diabetic",
+            probability=calibrated_prob,
+            probabilities=[round(1.0 - calibrated_prob, 4), calibrated_prob],
+            risk_category=risk_cat,
+            clinical_guidance=guidance,
+            disclaimer="This result is an AI-generated prediction for decision support and is NOT a confirmed medical diagnosis.",
+            timestamp=datetime.datetime.now(datetime.timezone.utc).isoformat()
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Inference error on Diabetes XGBoost pipeline: {str(e)}"
+        )

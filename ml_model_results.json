@@ -1,0 +1,611 @@
+[
+  {
+    "Dataset": "Dataset 1: Diabetes Risk",
+    "Model": "XGBoost",
+    "Accuracy": 97.46,
+    "Precision": 98.53,
+    "Recall": 49.67,
+    "F1_Score": 66.04,
+    "ROC_AUC": 0.9678,
+    "Train_Time_Sec": 1.77,
+    "Confusion_Matrix": [
+      [
+        25758,
+        10
+      ],
+      [
+        679,
+        670
+      ]
+    ]
+  },
+  {
+    "Dataset": "Dataset 1: Diabetes Risk",
+    "Model": "Neural Network (MLP)",
+    "Accuracy": 97.29,
+    "Precision": 90.7,
+    "Recall": 50.63,
+    "F1_Score": 64.99,
+    "ROC_AUC": 0.9605,
+    "Train_Time_Sec": 7.97,
+    "Confusion_Matrix": [
+      [
+        25698,
+        70
+      ],
+      [
+        666,
+        683
+      ]
+    ]
+  },
+  {
+    "Dataset": "Dataset 1: Diabetes Risk",
+    "Model": "LightGBM",
+    "Accuracy": 97.46,
+    "Precision": 98.53,
+    "Recall": 49.59,
+    "F1_Score": 65.98,
+    "ROC_AUC": 0.9674,
+    "Train_Time_Sec": 0.13,
+    "Confusion_Matrix": [
+      [
+        25758,
+        10
+      ],
+      [
+        680,
+        669
+      ]
+    ]
+  },
+  {
+    "Dataset": "Dataset 1: Diabetes Risk",
+    "Model": "Random Forest",
+    "Accuracy": 97.44,
+    "Precision": 100.0,
+    "Recall": 48.55,
+    "F1_Score": 65.37,
+    "ROC_AUC": 0.9531,
+    "Train_Time_Sec": 0.42,
+    "Confusion_Matrix": [
+      [
+        25768,
+        0
+      ],
+      [
+        694,
+        655
+      ]
+    ]
+  },
+  {
+    "Dataset": "Dataset 1: Diabetes Risk",
+    "Model": "Extra Trees",
+    "Accuracy": 96.65,
+    "Precision": 100.0,
+    "Recall": 32.62,
+    "F1_Score": 49.19,
+    "ROC_AUC": 0.9528,
+    "Train_Time_Sec": 0.3,
+    "Confusion_Matrix": [
+      [
+        25768,
+        0
+      ],
+      [
+        909,
+        440
+      ]
+    ]
+  },
+  {
+    "Dataset": "Dataset 1: Diabetes Risk",
+    "Model": "Decision Tree",
+    "Accuracy": 97.41,
+    "Precision": 97.93,
+    "Recall": 49.0,
+    "F1_Score": 65.32,
+    "ROC_AUC": 0.9599,
+    "Train_Time_Sec": 0.1,
+    "Confusion_Matrix": [
+      [
+        25754,
+        14
+      ],
+      [
+        688,
+        661
+      ]
+    ]
+  },
+  {
+    "Dataset": "Dataset 1: Diabetes Risk",
+    "Model": "Logistic Regression",
+    "Accuracy": 96.4,
+    "Precision": 79.94,
+    "Recall": 36.92,
+    "F1_Score": 50.51,
+    "ROC_AUC": 0.9386,
+    "Train_Time_Sec": 0.05,
+    "Confusion_Matrix": [
+      [
+        25643,
+        125
+      ],
+      [
+        851,
+        498
+      ]
+    ]
+  },
+  {
+    "Dataset": "Dataset 2: Appointment No-Shows",
+    "Model": "XGBoost",
+    "Accuracy": 80.6,
+    "Precision": 80.85,
+    "Recall": 99.46,
+    "F1_Score": 89.19,
+    "ROC_AUC": 0.7402,
+    "Train_Time_Sec": 0.14,
+    "Confusion_Matrix": [
+      [
+        161,
+        5718
+      ],
+      [
+        132,
+        24137
+      ]
+    ]
+  },
+  {
+    "Dataset": "Dataset 2: Appointment No-Shows",
+    "Model": "Neural Network (MLP)",
+    "Accuracy": 80.51,
+    "Precision": 80.54,
+    "Recall": 99.94,
+    "F1_Score": 89.2,
+    "ROC_AUC": 0.7287,
+    "Train_Time_Sec": 6.92,
+    "Confusion_Matrix": [
+      [
+        19,
+        5860
+      ],
+      [
+        15,
+        24254
+      ]
+    ]
+  },
+  {
+    "Dataset": "Dataset 2: Appointment No-Shows",
+    "Model": "LightGBM",
+    "Accuracy": 80.59,
+    "Precision": 80.83,
+    "Recall": 99.48,
+    "F1_Score": 89.19,
+    "ROC_AUC": 0.7393,
+    "Train_Time_Sec": 0.11,
+    "Confusion_Matrix": [
+      [
+        153,
+        5726
+      ],
+      [
+        125,
+        24144
+      ]
+    ]
+  },
+  {
+    "Dataset": "Dataset 2: Appointment No-Shows",
+    "Model": "Random Forest",
+    "Accuracy": 80.6,
+    "Precision": 80.73,
+    "Recall": 99.7,
+    "F1_Score": 89.21,
+    "ROC_AUC": 0.7406,
+    "Train_Time_Sec": 0.41,
+    "Confusion_Matrix": [
+      [
+        103,
+        5776
+      ],
+      [
+        74,
+        24195
+      ]
+    ]
+  },
+  {
+    "Dataset": "Dataset 2: Appointment No-Shows",
+    "Model": "Extra Trees",
+    "Accuracy": 80.52,
+    "Precision": 80.63,
+    "Recall": 99.76,
+    "F1_Score": 89.18,
+    "ROC_AUC": 0.7311,
+    "Train_Time_Sec": 0.3,
+    "Confusion_Matrix": [
+      [
+        63,
+        5816
+      ],
+      [
+        58,
+        24211
+      ]
+    ]
+  },
+  {
+    "Dataset": "Dataset 2: Appointment No-Shows",
+    "Model": "Decision Tree",
+    "Accuracy": 79.98,
+    "Precision": 80.91,
+    "Recall": 98.34,
+    "F1_Score": 88.77,
+    "ROC_AUC": 0.7196,
+    "Train_Time_Sec": 0.07,
+    "Confusion_Matrix": [
+      [
+        247,
+        5632
+      ],
+      [
+        404,
+        23865
+      ]
+    ]
+  },
+  {
+    "Dataset": "Dataset 2: Appointment No-Shows",
+    "Model": "Logistic Regression",
+    "Accuracy": 80.25,
+    "Precision": 80.72,
+    "Recall": 99.15,
+    "F1_Score": 88.99,
+    "ROC_AUC": 0.684,
+    "Train_Time_Sec": 0.02,
+    "Confusion_Matrix": [
+      [
+        131,
+        5748
+      ],
+      [
+        207,
+        24062
+      ]
+    ]
+  },
+  {
+    "Dataset": "Dataset 3: Appointment Reservation System",
+    "Model": "XGBoost",
+    "Accuracy": 80.07,
+    "Precision": 80.19,
+    "Recall": 99.27,
+    "F1_Score": 88.72,
+    "ROC_AUC": 0.6474,
+    "Train_Time_Sec": 0.1,
+    "Confusion_Matrix": [
+      [
+        287,
+        3253
+      ],
+      [
+        97,
+        13170
+      ]
+    ]
+  },
+  {
+    "Dataset": "Dataset 3: Appointment Reservation System",
+    "Model": "Neural Network (MLP)",
+    "Accuracy": 79.66,
+    "Precision": 79.91,
+    "Recall": 99.15,
+    "F1_Score": 88.5,
+    "ROC_AUC": 0.6054,
+    "Train_Time_Sec": 5.48,
+    "Confusion_Matrix": [
+      [
+        234,
+        3306
+      ],
+      [
+        113,
+        13154
+      ]
+    ]
+  },
+  {
+    "Dataset": "Dataset 3: Appointment Reservation System",
+    "Model": "LightGBM",
+    "Accuracy": 80.08,
+    "Precision": 80.18,
+    "Recall": 99.31,
+    "F1_Score": 88.73,
+    "ROC_AUC": 0.6513,
+    "Train_Time_Sec": 0.13,
+    "Confusion_Matrix": [
+      [
+        283,
+        3257
+      ],
+      [
+        91,
+        13176
+      ]
+    ]
+  },
+  {
+    "Dataset": "Dataset 3: Appointment Reservation System",
+    "Model": "Random Forest",
+    "Accuracy": 79.91,
+    "Precision": 79.97,
+    "Recall": 99.46,
+    "F1_Score": 88.66,
+    "ROC_AUC": 0.6378,
+    "Train_Time_Sec": 0.34,
+    "Confusion_Matrix": [
+      [
+        235,
+        3305
+      ],
+      [
+        72,
+        13195
+      ]
+    ]
+  },
+  {
+    "Dataset": "Dataset 3: Appointment Reservation System",
+    "Model": "Extra Trees",
+    "Accuracy": 79.79,
+    "Precision": 79.73,
+    "Recall": 99.77,
+    "F1_Score": 88.63,
+    "ROC_AUC": 0.6214,
+    "Train_Time_Sec": 0.27,
+    "Confusion_Matrix": [
+      [
+        174,
+        3366
+      ],
+      [
+        30,
+        13237
+      ]
+    ]
+  },
+  {
+    "Dataset": "Dataset 3: Appointment Reservation System",
+    "Model": "Decision Tree",
+    "Accuracy": 79.22,
+    "Precision": 80.26,
+    "Recall": 97.7,
+    "F1_Score": 88.13,
+    "ROC_AUC": 0.6084,
+    "Train_Time_Sec": 0.1,
+    "Confusion_Matrix": [
+      [
+        352,
+        3188
+      ],
+      [
+        305,
+        12962
+      ]
+    ]
+  },
+  {
+    "Dataset": "Dataset 3: Appointment Reservation System",
+    "Model": "Logistic Regression",
+    "Accuracy": 78.94,
+    "Precision": 78.94,
+    "Recall": 100.0,
+    "F1_Score": 88.23,
+    "ROC_AUC": 0.5709,
+    "Train_Time_Sec": 0.02,
+    "Confusion_Matrix": [
+      [
+        0,
+        3540
+      ],
+      [
+        0,
+        13267
+      ]
+    ]
+  },
+  {
+    "Dataset": "Dataset 4: Hospital Readmission Triage",
+    "Model": "XGBoost",
+    "Accuracy": 58.94,
+    "Precision": 52.29,
+    "Recall": 42.0,
+    "F1_Score": 40.51,
+    "ROC_AUC": 0.6859,
+    "Train_Time_Sec": 0.61,
+    "Confusion_Matrix": [
+      [
+        93,
+        1262,
+        1733
+      ],
+      [
+        73,
+        3879,
+        5782
+      ],
+      [
+        47,
+        2448,
+        12311
+      ]
+    ]
+  },
+  {
+    "Dataset": "Dataset 4: Hospital Readmission Triage",
+    "Model": "Neural Network (MLP)",
+    "Accuracy": 57.57,
+    "Precision": 51.7,
+    "Recall": 40.89,
+    "F1_Score": 39.15,
+    "ROC_AUC": 0.6489,
+    "Train_Time_Sec": 6.8,
+    "Confusion_Matrix": [
+      [
+        64,
+        1236,
+        1788
+      ],
+      [
+        61,
+        3866,
+        5807
+      ],
+      [
+        17,
+        2814,
+        11975
+      ]
+    ]
+  },
+  {
+    "Dataset": "Dataset 4: Hospital Readmission Triage",
+    "Model": "LightGBM",
+    "Accuracy": 59.12,
+    "Precision": 53.37,
+    "Recall": 42.25,
+    "F1_Score": 40.83,
+    "ROC_AUC": 0.6874,
+    "Train_Time_Sec": 0.49,
+    "Confusion_Matrix": [
+      [
+        100,
+        1268,
+        1720
+      ],
+      [
+        75,
+        3936,
+        5723
+      ],
+      [
+        40,
+        2467,
+        12299
+      ]
+    ]
+  },
+  {
+    "Dataset": "Dataset 4: Hospital Readmission Triage",
+    "Model": "Random Forest",
+    "Accuracy": 58.21,
+    "Precision": 46.69,
+    "Recall": 39.97,
+    "F1_Score": 37.11,
+    "ROC_AUC": 0.6729,
+    "Train_Time_Sec": 0.7,
+    "Confusion_Matrix": [
+      [
+        2,
+        1121,
+        1965
+      ],
+      [
+        4,
+        3189,
+        6541
+      ],
+      [
+        1,
+        1913,
+        12892
+      ]
+    ]
+  },
+  {
+    "Dataset": "Dataset 4: Hospital Readmission Triage",
+    "Model": "Extra Trees",
+    "Accuracy": 55.53,
+    "Precision": 37.55,
+    "Recall": 35.43,
+    "F1_Score": 28.24,
+    "ROC_AUC": 0.6604,
+    "Train_Time_Sec": 0.52,
+    "Confusion_Matrix": [
+      [
+        0,
+        344,
+        2744
+      ],
+      [
+        2,
+        762,
+        8970
+      ],
+      [
+        0,
+        226,
+        14580
+      ]
+    ]
+  },
+  {
+    "Dataset": "Dataset 4: Hospital Readmission Triage",
+    "Model": "Decision Tree",
+    "Accuracy": 57.01,
+    "Precision": 46.19,
+    "Recall": 40.52,
+    "F1_Score": 38.92,
+    "ROC_AUC": 0.6398,
+    "Train_Time_Sec": 0.26,
+    "Confusion_Matrix": [
+      [
+        78,
+        1283,
+        1727
+      ],
+      [
+        97,
+        3742,
+        5895
+      ],
+      [
+        88,
+        2787,
+        11931
+      ]
+    ]
+  },
+  {
+    "Dataset": "Dataset 4: Hospital Readmission Triage",
+    "Model": "Logistic Regression",
+    "Accuracy": 56.95,
+    "Precision": 48.72,
+    "Recall": 38.59,
+    "F1_Score": 35.46,
+    "ROC_AUC": 0.643,
+    "Train_Time_Sec": 0.2,
+    "Confusion_Matrix": [
+      [
+        30,
+        957,
+        2101
+      ],
+      [
+        37,
+        2485,
+        7212
+      ],
+      [
+        12,
+        1575,
+        13219
+      ]
+    ]
+  }
+]

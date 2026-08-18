@@ -1,0 +1,5 @@
+Dataset,Algorithm,Training Samples,Validation Samples,Test Samples,Accuracy,Precision,Recall,F1,ROC-AUC,PR-AUC,Training Time,Inference Time,Model Size
+Diabetes Risk,XGBoost,69990,14998,14998,91.59,50.31,89.49,64.41,0.9781,0.883,24.73,0.0713,0.33 MB
+Appointment No-Shows,LightGBM,74886,16047,16047,61.07,92.1,55.97,69.63,0.7438,0.9209,21.95,0.0983,0.5 MB
+Appointment Reservation,Extra Trees,42692,9149,9149,79.79,79.91,99.39,88.59,0.6317,0.8551,13.91,0.0995,64.51 MB
+Hospital Readmission,XGBoost (Multiclass),71236,15265,15265,59.41,54.09,41.88,40.14,0.6852,N/A (Multiclass),19.1,0.833,1.46 MB
