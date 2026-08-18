@@ -1,22 +1,21 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, Field
 from fastapi import APIRouter, HTTPException, status
 from app.core.security import create_access_token
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 class LoginRequest(BaseModel):
-    email: EmailStr
-    password: str
+    email: str = Field(..., description="User email address")
+    password: str = Field(..., description="User password")
 
 class RegisterRequest(BaseModel):
-    email: EmailStr
-    password: str
-    full_name: str
-    role: str = "patient"
+    email: str = Field(..., description="User email address")
+    password: str = Field(..., description="User password")
+    full_name: str = Field(..., description="Full name")
+    role: str = Field("patient", description="User role: patient, doctor, admin")
 
 @router.post("/login")
 async def login(payload: LoginRequest):
-    # Simulated auth login (supports doctor@careflow.ai, admin@careflow.ai, patient@careflow.ai)
     role = "patient"
     if "admin" in payload.email.lower():
         role = "admin"
@@ -29,7 +28,7 @@ async def login(payload: LoginRequest):
         "access_token": token,
         "token_type": "bearer",
         "user": {
-            "id": f"user-{hash(payload.email) % 10000}",
+            "id": f"user-{abs(hash(payload.email)) % 10000}",
             "email": payload.email,
             "full_name": payload.email.split("@")[0].capitalize(),
             "role": role
@@ -45,7 +44,7 @@ async def register(payload: RegisterRequest):
         "access_token": token,
         "token_type": "bearer",
         "user": {
-            "id": f"user-{hash(payload.email) % 10000}",
+            "id": f"user-{abs(hash(payload.email)) % 10000}",
             "email": payload.email,
             "full_name": payload.full_name,
             "role": payload.role
