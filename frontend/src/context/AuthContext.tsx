@@ -35,8 +35,12 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<UserProfile | null>(() => {
-    const saved = localStorage.getItem('careflow_user');
-    return saved ? JSON.parse(saved) : SYSTEM_USERS[2]; // Default demo patient
+    try {
+      const saved = localStorage.getItem('careflow_user');
+      return saved ? JSON.parse(saved) : SYSTEM_USERS[2]; // Default demo patient
+    } catch (e) {
+      return SYSTEM_USERS[2];
+    }
   });
 
   const role: UserRole | null = user?.role || null;
@@ -47,7 +51,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     );
 
     let assignedRole: UserRole = preferredRole || 'patient';
-    let assignedName: str = fullName || email.split('@')[0].toUpperCase();
+    let assignedName: string = fullName || email.split('@')[0].toUpperCase();
 
     if (found) {
       assignedRole = found.role;
@@ -65,15 +69,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     setUser(profile);
-    localStorage.setItem('careflow_user', JSON.stringify(profile));
-    localStorage.setItem('careflow_token', `token-${assignedRole}-xyz-123`);
+    try {
+      localStorage.setItem('careflow_user', JSON.stringify(profile));
+      localStorage.setItem('careflow_token', `token-${assignedRole}-xyz-123`);
+    } catch (e) {
+      console.error(e);
+    }
     return true;
   };
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem('careflow_user');
-    localStorage.removeItem('careflow_token');
+    try {
+      localStorage.removeItem('careflow_user');
+      localStorage.removeItem('careflow_token');
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   const switchRole = (newRole: UserRole) => {
@@ -85,7 +97,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       role: newRole
     };
     setUser(updated);
-    localStorage.setItem('careflow_user', JSON.stringify(updated));
+    try {
+      localStorage.setItem('careflow_user', JSON.stringify(updated));
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   return (
