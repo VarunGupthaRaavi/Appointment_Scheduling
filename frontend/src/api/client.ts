@@ -1,7 +1,9 @@
 import axios from 'axios';
 import { PredictionResult, ModelCardInfo, Appointment } from '../types';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1';
+const rawEnvUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1';
+const cleanUrl = rawEnvUrl.replace(/\/+$/, '');
+const API_BASE_URL = cleanUrl.endsWith('/api/v1') ? cleanUrl : `${cleanUrl}/api/v1`;
 
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,

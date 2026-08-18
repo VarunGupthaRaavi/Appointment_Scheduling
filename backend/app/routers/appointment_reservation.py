@@ -10,6 +10,7 @@ from app.ml.prediction_utils import derive_reservation_category
 router = APIRouter(prefix="/predict", tags=["Predictions"])
 
 @router.post("/appointment-reservation", response_model=PredictionResponse)
+@router.post("/reservation", response_model=PredictionResponse)
 async def predict_reservation(payload: AppointmentReservationInput, request: Request):
     model_id = "appointment_reservation"
     pipeline = model_loader.get_model(model_id)

@@ -10,6 +10,8 @@ from app.ml.prediction_utils import derive_noshow_risk_category
 router = APIRouter(prefix="/predict", tags=["Predictions"])
 
 @router.post("/appointment-no-show", response_model=PredictionResponse)
+@router.post("/appointment-noshow", response_model=PredictionResponse)
+@router.post("/noshow", response_model=PredictionResponse)
 async def predict_noshow(payload: AppointmentNoShowInput, request: Request):
     model_id = "appointment_noshow"
     pipeline = model_loader.get_model(model_id)
