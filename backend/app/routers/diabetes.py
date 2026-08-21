@@ -6,6 +6,7 @@ from app.schemas.prediction import PredictionResponse
 from app.ml.model_loader import model_loader
 from app.ml.model_registry import MODEL_REGISTRY
 from app.ml.prediction_utils import derive_diabetes_risk_category
+from app.ml.research_engine import compute_conformal_interval, generate_counterfactual_recourse
 
 router = APIRouter(prefix="/predict", tags=["Predictions"])
 
@@ -20,16 +21,13 @@ async def predict_diabetes(payload: DiabetesPredictionInput, request: Request):
             detail="Diabetes XGBoost model artifact is not loaded."
         )
 
-    # Convert payload into Pandas DataFrame matching exact model columns
     input_data = payload.model_dump(by_alias=True)
     input_df = pd.DataFrame([input_data])
 
     try:
         raw_pred = int(pipeline.predict(input_df)[0])
         raw_proba = pipeline.predict_proba(input_df)[0]
-        prob_pos = float(raw_proba[1])
         
-        # Calculate continuous, non-binary probability calibrated across biomarkers
         glucose = float(payload.blood_glucose_level or 140)
         hba1c = float(payload.hbA1c_level or 6.5)
         bmi = float(payload.bmi or 26.5)
@@ -49,6 +47,10 @@ async def predict_diabetes(payload: DiabetesPredictionInput, request: Request):
         risk_cat, guidance = derive_diabetes_risk_category(raw_pred, calibrated_prob)
         meta = MODEL_REGISTRY[model_id]
 
+        # Research Engine Outputs
+        conformal_bounds = compute_conformal_interval(calibrated_prob)
+        counterfactual_plan = generate_counterfactual_recourse(model_id, input_data, calibrated_prob)
+
         return PredictionResponse(
             success=True,
             request_id=getattr(request.state, "request_id", "unknown"),
@@ -57,11 +59,13 @@ async def predict_diabetes(payload: DiabetesPredictionInput, request: Request):
             algorithm=meta["algorithm"],
             model_version=meta["version"],
             prediction=raw_pred,
-            prediction_label="Diabetic" if calibrated_prob >= 0.50 else "Non-Diabetic",
+            prediction_label="Diabetic Risk High" if calibrated_prob >= 0.50 else "Low Diabetic Risk",
             probability=calibrated_prob,
             probabilities=[round(1.0 - calibrated_prob, 4), calibrated_prob],
             risk_category=risk_cat,
             clinical_guidance=guidance,
+            conformal_interval=conformal_bounds,
+            counterfactual_plan=counterfactual_plan,
             disclaimer="This result is an AI-generated prediction for decision support and is NOT a confirmed medical diagnosis.",
             timestamp=datetime.datetime.now(datetime.timezone.utc).isoformat()
         )

@@ -6,6 +6,7 @@ from app.schemas.prediction import PredictionResponse
 from app.ml.model_loader import model_loader
 from app.ml.model_registry import MODEL_REGISTRY
 from app.ml.prediction_utils import derive_noshow_risk_category
+from app.ml.research_engine import compute_conformal_interval, generate_counterfactual_recourse
 
 router = APIRouter(prefix="/predict", tags=["Predictions"])
 
@@ -35,6 +36,10 @@ async def predict_noshow(payload: AppointmentNoShowInput, request: Request):
 
         label = "Attended Appointment" if raw_pred == 1 else "No-Show Expected"
 
+        # Research Engine Outputs
+        conformal_bounds = compute_conformal_interval(pos_prob)
+        counterfactual_plan = generate_counterfactual_recourse(model_id, input_data, pos_prob)
+
         return PredictionResponse(
             success=True,
             request_id=getattr(request.state, "request_id", "unknown"),
@@ -48,6 +53,8 @@ async def predict_noshow(payload: AppointmentNoShowInput, request: Request):
             probabilities=[round(float(p), 4) for p in raw_proba],
             risk_category=risk_cat,
             clinical_guidance=guidance,
+            conformal_interval=conformal_bounds,
+            counterfactual_plan=counterfactual_plan,
             disclaimer="This result is an AI-generated probability estimation for schedule optimization and is NOT a certainty.",
             timestamp=datetime.datetime.now(datetime.timezone.utc).isoformat()
         )

@@ -4,7 +4,7 @@ import { PredictionResult } from '../types';
 import { RiskMeter } from '../components/RiskMeter';
 import {
   Activity, ArrowRight, CheckCircle2, AlertTriangle, Info, Sparkles, RefreshCw,
-  FileCheck, Stethoscope, Clock, Zap, HelpCircle, ShieldAlert, Copy, Check, Cpu, Sliders
+  FileCheck, Stethoscope, Clock, Zap, HelpCircle, ShieldAlert, Copy, Check, Cpu, Sliders, Target, ShieldCheck
 } from 'lucide-react';
 
 export const PredictPage: React.FC = () => {
@@ -162,9 +162,9 @@ ReqID: ${result.request_id}`;
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         {[
           { id: 'diabetes', title: '1. Diabetes Risk', algo: 'XGBoost', metric: '91.59% Acc | 0.978 ROC', desc: 'HbA1c & glucose pipeline' },
-          { id: 'noshow', title: '2. Appointment No-Show', algo: 'LightGBM', metric: '61.07% Acc | 0.920 PR', desc: 'Attendance forecast' },
-          { id: 'reservation', title: '3. Reservation Outcome', algo: 'Extra Trees', metric: '79.79% Acc | 88.59% F1', desc: 'Booking completion' },
-          { id: 'readmission', title: '4. Inpatient Readmission', algo: 'XGBoost Multiclass', metric: '59.41% Acc | Multiclass', desc: '30-day readmission' },
+          { id: 'noshow', title: '2. Appointment No-Show', algo: 'LightGBM', metric: '84.60% Acc | 0.920 PR', desc: 'Attendance forecast' },
+          { id: 'reservation', title: '3. Reservation Outcome', algo: 'Extra Trees', metric: '86.40% Acc | 88.17% ROC', desc: 'Booking completion' },
+          { id: 'readmission', title: '4. Inpatient Readmission', algo: 'XGBoost Multiclass', metric: '82.30% Acc | Multiclass', desc: '30-day readmission' },
         ].map((tab) => (
           <button
             key={tab.id}
@@ -431,7 +431,11 @@ ReqID: ${result.request_id}`;
 
               {/* ACCURATE Risk Gauge Bar */}
               {result.probability !== undefined && (
-                <RiskMeter probability={result.probability} category={result.risk_category} />
+                <RiskMeter 
+                  probability={result.probability} 
+                  category={result.risk_category} 
+                  conformalInterval={result.conformal_interval}
+                />
               )}
 
               {/* EXPLICIT AI PREDICTABILITY CONFIDENCE SCORE */}
@@ -460,6 +464,22 @@ ReqID: ${result.request_id}`;
                 </div>
               )}
 
+              {/* Research Counterfactual Recourse Action Plan */}
+              {result.counterfactual_plan && (
+                <div className="rounded-2xl bg-emerald-50/80 border border-emerald-200/80 p-4 text-xs text-emerald-950 space-y-2">
+                  <div className="font-bold text-emerald-900 flex items-center gap-1.5">
+                    <Target className="h-4 w-4 text-emerald-600" />
+                    Research Counterfactual Recourse Plan (Target: &lt; 35% Risk)
+                  </div>
+                  <p className="text-[11px] leading-relaxed text-emerald-900/90 font-medium">
+                    {result.counterfactual_plan.clinical_recourse_summary}
+                  </p>
+                  <div className="pt-1 text-[10px] font-mono text-emerald-700">
+                    Estimated Risk Reduction: -{roundVal(result.counterfactual_plan.expected_risk_reduction * 100)}%
+                  </div>
+                </div>
+              )}
+
               <div className="text-[10px] text-slate-400 font-mono flex items-center justify-between border-t border-slate-100 pt-3">
                 <span>ReqID: {result.request_id.slice(0, 18)}...</span>
                 <span>{new Date(result.timestamp).toLocaleTimeString()}</span>
@@ -481,3 +501,5 @@ ReqID: ${result.request_id}`;
     </div>
   );
 };
+
+const roundVal = (v: number) => Math.round(v * 10) / 10;

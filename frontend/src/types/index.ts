@@ -36,7 +36,23 @@ export interface ModelCardInfo {
   f1_score_percent: number;
   roc_auc: number;
   pr_auc?: number | null;
+  disparate_impact_ratio?: number;
+  conformal_coverage_rate?: number;
   performance_note: string;
+}
+
+export interface ConformalInterval {
+  lower: number;
+  upper: number;
+  confidence_level: number;
+  coverage_guarantee: string;
+}
+
+export interface CounterfactualPlan {
+  target_status: string;
+  actionable_interventions: Record<string, { current: any; target: any; change: string }>;
+  expected_risk_reduction: number;
+  clinical_recourse_summary: string;
 }
 
 export interface PredictionResult {
@@ -52,6 +68,8 @@ export interface PredictionResult {
   probabilities?: number[];
   risk_category?: string;
   clinical_guidance?: string;
+  conformal_interval?: ConformalInterval;
+  counterfactual_plan?: CounterfactualPlan;
   disclaimer: string;
   timestamp: string;
 }
