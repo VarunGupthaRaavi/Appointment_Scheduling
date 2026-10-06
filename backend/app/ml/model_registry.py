@@ -97,3 +97,14 @@ MODEL_REGISTRY: Dict[str, Dict[str, Any]] = {
 
 def get_model_metadata(model_id: str) -> Optional[Dict[str, Any]]:
     return MODEL_REGISTRY.get(model_id)
+
+def update_model_registry(model_id: str, new_info: Dict[str, Any]) -> None:
+    """
+    Updates the in-memory MODEL_REGISTRY with new metrics, sample counts, and timestamps.
+    """
+    if model_id in MODEL_REGISTRY:
+        if "metrics" in new_info and isinstance(new_info["metrics"], dict):
+            MODEL_REGISTRY[model_id]["metrics"].update(new_info["metrics"])
+        for k, v in new_info.items():
+            if k != "metrics":
+                MODEL_REGISTRY[model_id][k] = v

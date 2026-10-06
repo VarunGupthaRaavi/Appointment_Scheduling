@@ -1,73 +1,35 @@
 {
   "dataset_name": "archive/diabetes_dataset.csv",
-  "model_name": "XGBoost Classifier",
+  "model_name": "Diabetes Risk Prediction Model",
+  "algorithm": "XGBoost",
   "target": "diabetes",
-  "features": [
-    "year",
-    "gender",
-    "age",
-    "location",
-    "race:AfricanAmerican",
-    "race:Asian",
-    "race:Caucasian",
-    "race:Hispanic",
-    "race:Other",
-    "hypertension",
-    "heart_disease",
-    "smoking_history",
-    "bmi",
-    "hbA1c_level",
-    "blood_glucose_level"
-  ],
-  "split_ratios": {
-    "train": 0.7,
-    "validation": 0.15,
-    "test": 0.15
-  },
   "sample_counts": {
     "train": 69990,
     "validation": 14998,
-    "test": 14998
-  },
-  "hyperparameters": {
-    "classifier__learning_rate": 0.1,
-    "classifier__max_depth": 6,
-    "classifier__n_estimators": 150,
-    "classifier__subsample": 0.8
+    "test": 14998,
+    "total_dataset_used": 99986
   },
   "metrics": {
-    "accuracy": 0.9159,
-    "precision": 0.5031,
-    "recall": 0.8949,
-    "f1_score": 0.6441,
-    "roc_auc": 0.9781,
-    "pr_auc": 0.883,
+    "test_samples": 14998,
+    "accuracy": 0.9127,
+    "precision": 0.4927,
+    "recall": 0.9059,
+    "f1_score": 0.6383,
+    "roc_auc": 0.9785,
+    "pr_auc": 0.8843,
+    "preprocessor_fitted_samples": 69990,
+    "zero_leakage_verified": true,
     "confusion_matrix": [
       [
-        12596,
-        1127
+        12534,
+        1189
       ],
       [
-        134,
-        1141
+        120,
+        1155
       ]
     ]
   },
-  "performance_times": {
-    "training_time_seconds": 24.73,
-    "inference_time_seconds_test": 0.0713
-  },
-  "model_size_mb": 0.33,
-  "top_shap_features": {
-    "hbA1c_level": 2.837414026260376,
-    "blood_glucose_level": 2.190429925918579,
-    "age": 0.6315183639526367,
-    "bmi": 0.3756650388240814,
-    "smoking_history_No Info": 0.1514134258031845,
-    "gender_Male": 0.118294857442379,
-    "hypertension": 0.07900713384151459,
-    "heart_disease": 0.06830170005559921,
-    "race:Other": 0.05595133453607559,
-    "year": 0.03207464888691902
-  }
+  "training_time_seconds": 1.69,
+  "last_trained_at": "2026-10-06T07:32:40.370518+00:00"
 }

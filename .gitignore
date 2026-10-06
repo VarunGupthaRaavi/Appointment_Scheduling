@@ -26,3 +26,20 @@ build/
 Thumbs.db
 .vscode/
 .idea/
+
+# Reports and raw dataset archives
+*.docx
+archive/
+archive (2)/
+archive (3)/
+diabetes+130-us+hospitals+for+years+1999-2008/
+build_complete_*.py
+build_dissertation_*.py
+build_expanded_*.py
+build_fixed_*.py
+build_kakatiya_*.py
+build_perfect_*.py
+build_revised_*.py
+build_word_*.py
+create_replica_*.py
+test_init.py

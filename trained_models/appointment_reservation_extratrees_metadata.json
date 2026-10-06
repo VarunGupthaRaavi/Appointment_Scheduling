@@ -1,105 +1,35 @@
 {
   "dataset_name": "archive (3)/2017.csv",
-  "model_name": "Extra Trees Classifier",
+  "model_name": "Appointment Reservation Model",
+  "algorithm": "Extra Trees",
   "target": "show",
-  "features": [
-    "especialidad",
-    "edad",
-    "sexo",
-    "reserva_mes_d",
-    "reserva_mes_c",
-    "reserva_dia_d",
-    "reserva_dia_c",
-    "reserva_hora_d",
-    "reserva_hora_c",
-    "creacion_mes_d",
-    "creacion_mes_c",
-    "creacion_dia_d",
-    "creacion_dia_c",
-    "creacion_hora_d",
-    "creacion_hora_c",
-    "latencia",
-    "canal",
-    "tipo"
-  ],
-  "split_ratios": {
-    "train": 0.7,
-    "validation": 0.15,
-    "test": 0.15
-  },
   "sample_counts": {
     "train": 42692,
     "validation": 9149,
-    "test": 9149
-  },
-  "hyperparameters": {
-    "classifier__max_depth": 16,
-    "classifier__min_samples_split": 5,
-    "classifier__n_estimators": 100
+    "test": 9149,
+    "total_dataset_used": 60990
   },
   "metrics": {
-    "accuracy": 0.7979,
-    "precision": 0.7991,
-    "recall": 0.9939,
-    "f1_score": 0.8859,
-    "roc_auc": 0.6317,
-    "pr_auc": 0.8551,
+    "test_samples": 9149,
+    "accuracy": 0.7981,
+    "precision": 0.7984,
+    "recall": 0.9958,
+    "f1_score": 0.8862,
+    "roc_auc": 0.6301,
+    "pr_auc": 0.853,
+    "preprocessor_fitted_samples": 42692,
+    "zero_leakage_verified": true,
     "confusion_matrix": [
       [
-        119,
-        1805
+        107,
+        1817
       ],
       [
-        44,
-        7181
+        30,
+        7195
       ]
     ]
   },
-  "performance_times": {
-    "training_time_seconds": 13.91,
-    "inference_time_seconds_test": 0.0995
-  },
-  "model_size_mb": 64.51,
-  "top_shap_features": {
-    "tipo": [
-      0.022385989059520488,
-      0.022385989059520484
-    ],
-    "edad": [
-      0.013511591847807789,
-      0.013511591847807794
-    ],
-    "especialidad": [
-      0.010699485522503018,
-      0.010699485522502982
-    ],
-    "sexo": [
-      0.010473393328552892,
-      0.010473393328552882
-    ],
-    "reserva_hora_d": [
-      0.009116943358551325,
-      0.0091169433585513
-    ],
-    "reserva_hora_c": [
-      0.00795991225774647,
-      0.007959912257746475
-    ],
-    "canal": [
-      0.007455394558176456,
-      0.007455394558176455
-    ],
-    "creacion_hora_d": [
-      0.005040061437811732,
-      0.005040061437811721
-    ],
-    "reserva_dia_c": [
-      0.004760928467480094,
-      0.004760928467480077
-    ],
-    "reserva_dia_d": [
-      0.0041836225001965896,
-      0.004183622500196597
-    ]
-  }
+  "training_time_seconds": 0.59,
+  "last_trained_at": "2026-10-06T07:32:41.832388+00:00"
 }

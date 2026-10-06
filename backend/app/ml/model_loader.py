@@ -65,6 +65,15 @@ class ModelLoader:
                     with open(abs_meta_path, 'r', encoding='utf-8') as f:
                         meta_data = json.load(f)
                     self._metadata[model_id] = meta_data
+                    if "metrics" in meta_data and isinstance(meta_data["metrics"], dict):
+                        MODEL_REGISTRY[model_id]["metrics"].update(meta_data["metrics"])
+                    if "sample_counts" in meta_data and isinstance(meta_data["sample_counts"], dict):
+                        MODEL_REGISTRY[model_id]["trained_samples"] = meta_data["sample_counts"].get("train")
+                        MODEL_REGISTRY[model_id]["total_samples"] = meta_data["sample_counts"].get("total_dataset_used")
+                    if "last_trained_at" in meta_data:
+                        MODEL_REGISTRY[model_id]["last_trained_at"] = meta_data["last_trained_at"]
+                    if "training_time_seconds" in meta_data:
+                        MODEL_REGISTRY[model_id]["training_time_seconds"] = meta_data["training_time_seconds"]
                 else:
                     self._metadata[model_id] = reg_info
 
@@ -82,6 +91,44 @@ class ModelLoader:
 
     def is_model_loaded(self, model_id: str) -> bool:
         return self._loaded_status.get(model_id, False)
+
+    def reload_model(self, model_id: str) -> bool:
+        """
+        Reloads a specific model pipeline and its metadata from disk after retraining.
+        """
+        if model_id not in MODEL_REGISTRY:
+            return False
+        reg_info = MODEL_REGISTRY[model_id]
+        target_dir = self._find_model_directory()
+        rel_model_filename = os.path.basename(reg_info["artifact_path"])
+        rel_meta_filename = os.path.basename(reg_info["metadata_path"])
+        abs_model_path = target_dir / rel_model_filename
+        abs_meta_path = target_dir / rel_meta_filename
+
+        if not abs_model_path.exists():
+            return False
+        try:
+            pipeline = joblib.load(abs_model_path)
+            self._models[model_id] = pipeline
+            if abs_meta_path.exists():
+                with open(abs_meta_path, 'r', encoding='utf-8') as f:
+                    meta_data = json.load(f)
+                self._metadata[model_id] = meta_data
+                if "metrics" in meta_data and isinstance(meta_data["metrics"], dict):
+                    MODEL_REGISTRY[model_id]["metrics"].update(meta_data["metrics"])
+                if "sample_counts" in meta_data and isinstance(meta_data["sample_counts"], dict):
+                    MODEL_REGISTRY[model_id]["trained_samples"] = meta_data["sample_counts"].get("train")
+                    MODEL_REGISTRY[model_id]["total_samples"] = meta_data["sample_counts"].get("total_dataset_used")
+                if "last_trained_at" in meta_data:
+                    MODEL_REGISTRY[model_id]["last_trained_at"] = meta_data["last_trained_at"]
+                if "training_time_seconds" in meta_data:
+                    MODEL_REGISTRY[model_id]["training_time_seconds"] = meta_data["training_time_seconds"]
+            self._loaded_status[model_id] = True
+            logger.info(f"Reloaded model {model_id} successfully.")
+            return True
+        except Exception as e:
+            logger.error(f"Error reloading model {model_id}: {e}")
+            return False
 
     def get_all_status(self) -> Dict[str, Dict[str, Any]]:
         status_dict = {}

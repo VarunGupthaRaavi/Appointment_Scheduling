@@ -52,6 +52,21 @@ export const fetchAdminModels = async (): Promise<ModelCardInfo[]> => {
   return res.data.models;
 };
 
+export const trainAdminModel = async (
+  modelId: string,
+  payload?: { sample_size?: number | null; optimize?: boolean }
+) => {
+  const res = await apiClient.post(`/admin/models/${modelId}/train`, payload || {});
+  return res.data;
+};
+
+export const trainAllAdminModels = async (
+  payload?: { sample_size?: number | null; optimize?: boolean }
+) => {
+  const res = await apiClient.post('/admin/models/train-all', payload || {});
+  return res.data;
+};
+
 export const fetchAdminAnalytics = async () => {
   const res = await apiClient.get('/admin/analytics');
   return res.data;

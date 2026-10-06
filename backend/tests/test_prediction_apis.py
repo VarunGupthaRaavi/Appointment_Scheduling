@@ -6,8 +6,11 @@ from fastapi.testclient import TestClient
 # Add backend to path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
+from app.ml.model_loader import model_loader
 from app.main import app
 
+# Ensure models are loaded for testing
+model_loader.load_all_models()
 client = TestClient(app)
 
 def test_health_endpoints():
@@ -31,8 +34,9 @@ def test_diabetes_prediction_api():
     assert res.status_code == 200
     data = res.json()
     assert data["success"] is True
-    assert data["algorithm"] == "XGBoost"
-    assert "prediction" in data
+    assert data["model_id"] == "diabetes_risk"
+    assert data["prediction"] in [0, 1]
+    assert 0.0 <= data["probability"] <= 1.0
 
 def test_noshow_prediction_api():
     payload = {
@@ -44,7 +48,8 @@ def test_noshow_prediction_api():
     assert res.status_code == 200
     data = res.json()
     assert data["success"] is True
-    assert data["algorithm"] == "LightGBM"
+    assert data["model_id"] == "appointment_noshow"
+    assert data["prediction"] in [0, 1]
 
 def test_reservation_prediction_api():
     payload = {
@@ -57,7 +62,8 @@ def test_reservation_prediction_api():
     assert res.status_code == 200
     data = res.json()
     assert data["success"] is True
-    assert data["algorithm"] == "Extra Trees"
+    assert data["model_id"] == "appointment_reservation"
+    assert data["prediction"] in [0, 1]
 
 def test_readmission_prediction_api():
     payload = {
@@ -94,3 +100,23 @@ def test_unified_patient_analyze_api():
     data = res.json()
     assert "diabetes_risk" in data["models_executed"]
     assert "diabetes_risk" in data["results"]
+
+def test_admin_models_and_retraining_api():
+    # Test GET admin models
+    res = client.get("/api/v1/admin/models")
+    assert res.status_code == 200
+    data = res.json()
+    assert data["success"] is True
+    assert len(data["models"]) == 4
+    for m in data["models"]:
+        assert "trained_samples" in m
+        assert "total_samples" in m
+        assert m["total_samples"] > 0
+
+    # Test retraining single model endpoint
+    train_res = client.post("/api/v1/admin/models/diabetes_risk/train", json={"sample_size": 2000, "optimize": True})
+    assert train_res.status_code == 200
+    train_data = train_res.json()
+    assert train_data["success"] is True
+    assert train_data["result"]["total_dataset_used"] == 2000
+    assert train_data["result"]["accuracy"] > 0.8

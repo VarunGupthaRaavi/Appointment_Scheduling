@@ -1,72 +1,35 @@
 {
   "dataset_name": "archive (2)/healthcare_noshows_appt.csv",
-  "model_name": "LightGBM Classifier",
+  "model_name": "Appointment No-Show Predictor",
+  "algorithm": "LightGBM",
   "target": "Showed_up",
-  "features": [
-    "Gender",
-    "Age",
-    "Neighbourhood",
-    "Scholarship",
-    "Hipertension",
-    "Diabetes",
-    "Alcoholism",
-    "Handcap",
-    "SMS_received",
-    "lead_time_days",
-    "scheduled_dow",
-    "scheduled_hour",
-    "appointment_dow",
-    "appointment_month"
-  ],
-  "split_ratios": {
-    "train": 0.7,
-    "validation": 0.15,
-    "test": 0.15
-  },
   "sample_counts": {
     "train": 74886,
     "validation": 16047,
-    "test": 16047
-  },
-  "hyperparameters": {
-    "classifier__learning_rate": 0.1,
-    "classifier__max_depth": 6,
-    "classifier__n_estimators": 150,
-    "classifier__num_leaves": 31
+    "test": 16047,
+    "total_dataset_used": 106980
   },
   "metrics": {
-    "accuracy": 0.6107,
-    "precision": 0.921,
-    "recall": 0.5597,
-    "f1_score": 0.6963,
+    "test_samples": 16047,
+    "accuracy": 0.6021,
+    "precision": 0.923,
+    "recall": 0.5465,
+    "f1_score": 0.6866,
     "roc_auc": 0.7438,
-    "pr_auc": 0.9209,
+    "pr_auc": 0.921,
+    "preprocessor_fitted_samples": 74886,
+    "zero_leakage_verified": true,
     "confusion_matrix": [
       [
-        2638,
-        614
+        2669,
+        583
       ],
       [
-        5633,
-        7162
+        5802,
+        6993
       ]
     ]
   },
-  "performance_times": {
-    "training_time_seconds": 21.95,
-    "inference_time_seconds_test": 0.0983
-  },
-  "model_size_mb": 0.5,
-  "top_shap_features": {
-    "lead_time_days": 1.0507954835173092,
-    "Age": 0.25034992308846776,
-    "SMS_received": 0.05785532937730818,
-    "appointment_month": 0.04977801022291789,
-    "Gender_F": 0.04824960334634217,
-    "scheduled_dow": 0.030650141519150336,
-    "Scholarship": 0.029396217851185468,
-    "appointment_dow": 0.02618618178302026,
-    "Neighbourhood_SANTA MARTHA": 0.021281120779408018,
-    "Hipertension": 0.020498602020749226
-  }
+  "training_time_seconds": 0.61,
+  "last_trained_at": "2026-10-06T07:32:41.101727+00:00"
 }

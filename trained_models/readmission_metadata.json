@@ -1,107 +1,42 @@
 {
-  "dataset_name": "diabetes+130-us+hospitals+for+years+1999-2008/diabetic_data.csv",
-  "model_name": "XGBoost Multiclass Classifier",
+  "dataset_name": "diabetic_data.csv",
+  "model_name": "Hospital Readmission Triage Model",
+  "algorithm": "XGBoost Multiclass",
   "target": "readmitted (0: NO, 1: >30, 2: <30)",
-  "features": [
-    "race",
-    "gender",
-    "age",
-    "admission_type_id",
-    "discharge_disposition_id",
-    "admission_source_id",
-    "time_in_hospital",
-    "payer_code",
-    "medical_specialty",
-    "num_lab_procedures",
-    "num_procedures",
-    "num_medications",
-    "number_outpatient",
-    "number_emergency",
-    "number_inpatient",
-    "diag_1",
-    "diag_2",
-    "diag_3",
-    "number_diagnoses",
-    "max_glu_serum",
-    "A1Cresult",
-    "metformin",
-    "repaglinide",
-    "nateglinide",
-    "chlorpropamide",
-    "glimepiride",
-    "acetohexamide",
-    "glipizide",
-    "glyburide",
-    "tolbutamide",
-    "pioglitazone",
-    "rosiglitazone",
-    "acarbose",
-    "miglitol",
-    "troglitazone",
-    "tolazamide",
-    "examide",
-    "citoglipton",
-    "insulin",
-    "glyburide-metformin",
-    "glipizide-metformin",
-    "glimepiride-pioglitazone",
-    "metformin-rosiglitazone",
-    "metformin-pioglitazone",
-    "change",
-    "diabetesMed",
-    "total_prior_visits"
-  ],
-  "split_ratios": {
-    "train": 0.7,
-    "validation": 0.15,
-    "test": 0.15
-  },
   "sample_counts": {
     "train": 71236,
     "validation": 15265,
-    "test": 15265
+    "test": 15265,
+    "total_dataset_used": 101766
   },
   "metrics": {
-    "accuracy": 0.5941,
-    "balanced_accuracy": 0.4188,
-    "precision_macro": 0.5409,
-    "recall_macro": 0.4188,
-    "f1_macro": 0.4014,
-    "roc_auc_ovr": 0.6852,
+    "test_samples": 15265,
+    "accuracy": 0.5927,
+    "precision": 0.5487,
+    "recall": 0.4141,
+    "f1_score": 0.3933,
+    "roc_auc": 0.6818,
+    "pr_auc": 0.5487,
+    "preprocessor_fitted_samples": 71236,
+    "zero_leakage_verified": true,
     "confusion_matrix": [
       [
-        6974,
-        1238,
-        18
+        7042,
+        1180,
+        8
       ],
       [
-        3252,
-        2055,
-        25
+        3335,
+        1980,
+        17
       ],
       [
-        999,
-        664,
-        40
+        1017,
+        660,
+        26
       ]
     ]
   },
-  "performance_times": {
-    "training_time_seconds": 19.1,
-    "inference_time_seconds_test": 0.833
-  },
-  "model_size_mb": 1.46,
-  "top_shap_features": {
-    "number_inpatient": 0.20339274406433105,
-    "discharge_disposition_id": 0.1795971393585205,
-    "payer_code_Unknown": 0.038867752999067307,
-    "total_prior_visits": 0.03349752351641655,
-    "time_in_hospital": 0.029944084584712982,
-    "number_diagnoses": 0.02222530171275139,
-    "number_emergency": 0.02000191994011402,
-    "num_medications": 0.019420946016907692,
-    "num_lab_procedures": 0.018386205658316612,
-    "diabetesMed_No": 0.013012651354074478
-  },
-  "accuracy_note": "Achieved ~59.1% multiclass accuracy. Performance reflects realistic clinical prediction bounds on 130-US Hospitals dataset without target leakage."
+  "training_time_seconds": 14.82,
+  "last_trained_at": "2026-10-06T07:32:57.463295+00:00"
 }
