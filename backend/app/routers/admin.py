@@ -117,6 +117,8 @@ async def train_model_endpoint(model_id: str, payload: Optional[TrainModelReques
         )
 
 @router.post("/models/{model_id}/add-data")
+@router.post("/models/{model_id}/ingest-data")
+@router.post("/models/{model_id}/ingest")
 async def add_model_data_endpoint(model_id: str, payload: Optional[AddDataRequest] = None):
     """
     Ingests additional clinical records into the model's dataset pool.
@@ -143,6 +145,9 @@ async def add_model_data_endpoint(model_id: str, payload: Optional[AddDataReques
         )
 
 @router.post("/models/{model_id}/upload-dataset")
+@router.post("/models/{model_id}/upload-data")
+@router.post("/models/{model_id}/upload")
+@router.post("/models/{model_id}/upload-csv")
 async def upload_dataset_endpoint(model_id: str, file: UploadFile = File(...)):
     """
     Uploads a custom CSV dataset file to expand the training pool for the specified model.

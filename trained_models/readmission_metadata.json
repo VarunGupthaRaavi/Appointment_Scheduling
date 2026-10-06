@@ -4,39 +4,39 @@
   "algorithm": "XGBoost Multiclass",
   "target": "readmitted (0: NO, 1: >30, 2: <30)",
   "sample_counts": {
-    "train": 71236,
-    "validation": 15265,
-    "test": 15265,
-    "total_dataset_used": 101766
+    "train": 17500,
+    "validation": 3750,
+    "test": 3750,
+    "total_dataset_used": 25000
   },
   "metrics": {
-    "test_samples": 15265,
-    "accuracy": 0.5927,
-    "precision": 0.5487,
-    "recall": 0.4141,
-    "f1_score": 0.3933,
-    "roc_auc": 0.6818,
-    "pr_auc": 0.5487,
-    "preprocessor_fitted_samples": 71236,
+    "test_samples": 3750,
+    "accuracy": 0.5883,
+    "precision": 0.5297,
+    "recall": 0.409,
+    "f1_score": 0.3876,
+    "roc_auc": 0.6613,
+    "pr_auc": 0.5297,
+    "preprocessor_fitted_samples": 17500,
     "zero_leakage_verified": true,
     "confusion_matrix": [
       [
-        7042,
-        1180,
-        8
+        1743,
+        277,
+        2
       ],
       [
-        3335,
-        1980,
-        17
+        848,
+        456,
+        6
       ],
       [
-        1017,
-        660,
-        26
+        247,
+        164,
+        7
       ]
     ]
   },
-  "training_time_seconds": 14.82,
-  "last_trained_at": "2026-10-06T07:32:57.463295+00:00"
+  "training_time_seconds": 4.28,
+  "last_trained_at": "2026-10-06T09:11:57.463954+00:00"
 }

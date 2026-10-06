@@ -77,11 +77,8 @@ export const uploadAdminModelDataset = async (
   const cleanId = modelId.replace(/-/g, '_');
   const formData = new FormData();
   formData.append('file', file);
-  const res = await apiClient.post(`/admin/models/${cleanId}/upload-dataset`, formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  });
+  // Do NOT pass explicit Content-Type: multipart/form-data so Axios and the browser generate the correct multipart boundary
+  const res = await apiClient.post(`/admin/models/${cleanId}/upload-dataset`, formData);
   return res.data;
 };
 
