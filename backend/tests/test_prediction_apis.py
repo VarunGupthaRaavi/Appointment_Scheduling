@@ -120,3 +120,18 @@ def test_admin_models_and_retraining_api():
     assert train_data["success"] is True
     assert train_data["result"]["total_dataset_used"] == 2000
     assert train_data["result"]["accuracy"] > 0.8
+
+    # Test adding clinical records to dataset pool
+    add_res = client.post("/admin/models/diabetes_risk/add-data", json={"records_count": 1000})
+    assert add_res.status_code == 200
+    add_data = add_res.json()
+    assert add_data["success"] is True
+    assert add_data["records_added"] == 1000
+    assert add_data["new_total_records"] > add_data["previous_total"]
+
+    # Test retraining with alias and model ID normalization (kebab-case)
+    train_kebab = client.post("/admin/models/appointment-noshow/retrain", json={"sample_size": 2000, "optimize": True})
+    assert train_kebab.status_code == 200
+    assert train_kebab.json()["success"] is True
+    assert train_kebab.json()["model_id"] == "appointment_noshow"
+

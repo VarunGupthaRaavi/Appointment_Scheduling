@@ -4,32 +4,32 @@
   "algorithm": "XGBoost",
   "target": "diabetes",
   "sample_counts": {
-    "train": 69990,
-    "validation": 14998,
-    "test": 14998,
-    "total_dataset_used": 99986
+    "train": 1400,
+    "validation": 300,
+    "test": 300,
+    "total_dataset_used": 2000
   },
   "metrics": {
-    "test_samples": 14998,
-    "accuracy": 0.9127,
-    "precision": 0.4927,
-    "recall": 0.9059,
-    "f1_score": 0.6383,
-    "roc_auc": 0.9785,
-    "pr_auc": 0.8843,
-    "preprocessor_fitted_samples": 69990,
+    "test_samples": 300,
+    "accuracy": 0.9667,
+    "precision": 0.7778,
+    "recall": 0.84,
+    "f1_score": 0.8077,
+    "roc_auc": 0.9727,
+    "pr_auc": 0.9093,
+    "preprocessor_fitted_samples": 1400,
     "zero_leakage_verified": true,
     "confusion_matrix": [
       [
-        12534,
-        1189
+        269,
+        6
       ],
       [
-        120,
-        1155
+        4,
+        21
       ]
     ]
   },
-  "training_time_seconds": 1.69,
-  "last_trained_at": "2026-10-06T07:32:40.370518+00:00"
+  "training_time_seconds": 0.35,
+  "last_trained_at": "2026-10-06T08:57:11.833712+00:00"
 }

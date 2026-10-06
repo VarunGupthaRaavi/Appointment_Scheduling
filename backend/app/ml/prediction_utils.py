@@ -10,13 +10,16 @@ def derive_diabetes_risk_category(pred: int, proba: float) -> Tuple[str, str]:
 
 def derive_noshow_risk_category(pred: int, proba: Any) -> Tuple[str, str]:
     if hasattr(proba, "__getitem__"):
-        prob_val = float(proba[1]) if len(proba) > 1 else float(proba[0])
+        attend_prob = float(proba[1]) if len(proba) > 1 else float(proba[0])
     else:
-        prob_val = float(proba)
+        attend_prob = float(proba)
 
-    if pred == 0 or prob_val >= 0.65:
-        return "High No-Show Risk", "Patient has a high probability of missing the appointment. Recommend automated SMS reminder."
-    elif prob_val >= 0.35:
+    # Invert to calculate genuine No-Show Risk probability
+    noshow_risk = 1.0 - attend_prob if attend_prob <= 1.0 else (100.0 - attend_prob) / 100.0
+
+    if pred == 0 or noshow_risk >= 0.60:
+        return "High No-Show Risk", "Patient has an elevated probability of missing the appointment. Recommend automated SMS reminder."
+    elif noshow_risk >= 0.30:
         return "Moderate No-Show Risk", "Moderate chance of missed appointment. Send confirmation notification."
     else:
         return "Low No-Show Risk", "High probability of appointment attendance."

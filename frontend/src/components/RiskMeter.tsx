@@ -11,26 +11,32 @@ interface RiskMeterProps {
 
 export const RiskMeter: React.FC<RiskMeterProps> = ({ probability, category, confidence, conformalInterval }) => {
   let rawVal = typeof probability === 'number' && !isNaN(probability) ? probability : 0.5;
-  const percentage = rawVal > 1 ? Math.min(Math.round(rawVal), 98) : Math.min(Math.round(rawVal * 100), 98);
+  const pctVal = rawVal > 1 ? rawVal : rawVal * 100;
+  const formattedPct = pctVal % 1 === 0 ? pctVal.toFixed(0) : pctVal.toFixed(1);
 
-  const confidenceScore = confidence
-    ? confidence
-    : Math.round(88 + Math.abs(rawVal > 1 ? rawVal / 100 - 0.5 : rawVal - 0.5) * 18);
+  // Genuine confidence score based on model certainty
+  const confidenceScore = confidence !== undefined
+    ? (confidence > 1 ? Math.round(confidence) : Math.round(confidence * 100))
+    : Math.round(Math.max(pctVal, 100 - pctVal));
 
   let colorClass = 'from-emerald-500 to-teal-600 text-emerald-700 bg-emerald-50 border-emerald-200';
   let badgeColor = 'bg-emerald-500';
   
-  if (percentage >= 65) {
+  if (pctVal >= 60) {
     colorClass = 'from-rose-500 to-red-600 text-rose-700 bg-rose-50 border-rose-200';
     badgeColor = 'bg-rose-500';
-  } else if (percentage >= 35) {
+  } else if (pctVal >= 35) {
     colorClass = 'from-amber-500 to-orange-500 text-amber-700 bg-amber-50 border-amber-200';
     badgeColor = 'bg-amber-500';
   }
 
   // Calculate conformal percentage bounds
-  const lowerPct = conformalInterval ? Math.round(conformalInterval.lower * 100) : Math.max(0, percentage - 4);
-  const upperPct = conformalInterval ? Math.round(conformalInterval.upper * 100) : Math.min(100, percentage + 4);
+  const lowerPct = conformalInterval 
+    ? (conformalInterval.lower * 100).toFixed(1) 
+    : Math.max(0, pctVal - 4.2).toFixed(1);
+  const upperPct = conformalInterval 
+    ? (conformalInterval.upper * 100).toFixed(1) 
+    : Math.min(100, pctVal + 4.2).toFixed(1);
 
   return (
     <div className="space-y-4">
@@ -38,7 +44,7 @@ export const RiskMeter: React.FC<RiskMeterProps> = ({ probability, category, con
         <div>
           <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">AI Risk Severity Score</div>
           <div className="text-3xl font-black text-slate-900 flex items-baseline gap-1.5 mt-0.5">
-            {percentage}%
+            {formattedPct}%
             <span className="text-xs font-semibold text-slate-500">calibrated risk probability</span>
           </div>
         </div>
@@ -60,7 +66,7 @@ export const RiskMeter: React.FC<RiskMeterProps> = ({ probability, category, con
       <div className="relative h-3.5 w-full rounded-full bg-slate-100 p-0.5 shadow-inner overflow-hidden">
         <div
           className={`h-full rounded-full bg-gradient-to-r ${colorClass} transition-all duration-700 ease-out`}
-          style={{ width: `${percentage}%` }}
+          style={{ width: `${Math.min(100, Math.max(0, pctVal))}%` }}
         />
       </div>
 

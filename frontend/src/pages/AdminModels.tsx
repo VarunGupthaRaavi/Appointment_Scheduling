@@ -1,10 +1,17 @@
-import React, { useEffect, useState } from 'react';
-import { fetchAdminModels, trainAdminModel, trainAllAdminModels } from '../api/client';
+import React, { useEffect, useState, useRef } from 'react';
+import {
+  fetchAdminModels,
+  trainAdminModel,
+  trainAllAdminModels,
+  addAdminModelData,
+  uploadAdminModelDataset
+} from '../api/client';
 import { ModelCardInfo } from '../types';
 import {
   Cpu, ShieldCheck, AlertCircle, RefreshCw, BarChart2, Clock, Code2, Database,
   Layers, CheckCircle2, Sparkles, Scale, Target, Award, ShieldAlert,
-  Zap, Loader2, TrendingUp, Sliders, Play, Check, Server
+  Zap, Loader2, TrendingUp, Sliders, Play, Check, Server, PlusCircle,
+  UploadCloud, FileSpreadsheet
 } from 'lucide-react';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend, CartesianGrid } from 'recharts';
 
@@ -143,6 +150,15 @@ export const AdminModelsPage: React.FC = () => {
     details?: any;
   }>({ type: null, message: '' });
 
+  // Data Expansion State
+  const [isAddingData, setIsAddingData] = useState<boolean>(false);
+  const [isUploadingCSV, setIsUploadingCSV] = useState<boolean>(false);
+  const [dataFeedback, setDataFeedback] = useState<{
+    type: 'success' | 'error' | null;
+    message: string;
+  }>({ type: null, message: '' });
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const loadModels = () => {
     setLoading(true);
     fetchAdminModels()
@@ -169,6 +185,70 @@ export const AdminModelsPage: React.FC = () => {
   const liveTestSamples = activeModelData ? activeModelData.test_samples.toLocaleString() : activeSpec.test_samples;
   const liveTrainedSamples = activeModelData?.trained_samples ? activeModelData.trained_samples.toLocaleString() : "70,000";
   const liveTotalDataset = activeModelData?.total_samples ? activeModelData.total_samples.toLocaleString() : activeSpec.max_records.toLocaleString();
+
+  // Handlers for Data Addition
+  const handleAddMoreData = async (count: number) => {
+    setIsAddingData(true);
+    setDataFeedback({ type: null, message: '' });
+    try {
+      const res = await addAdminModelData(activeModelId, { records_count: count });
+      if (res.success) {
+        setModels(prev => prev.map(m => {
+          if (m.model_id === activeModelId) {
+            return {
+              ...m,
+              total_samples: res.new_total_records
+            };
+          }
+          return m;
+        }));
+        setDataFeedback({
+          type: 'success',
+          message: `Successfully ingested +${res.records_added.toLocaleString()} clinical records into ${activeSpec.name.split('—')[1]?.trim() || activeSpec.name}! Total training pool expanded to ${res.new_total_records.toLocaleString()} records.`
+        });
+      }
+    } catch (err: any) {
+      setDataFeedback({
+        type: 'error',
+        message: err?.response?.data?.detail || 'Failed to ingest clinical records. Please verify backend service.'
+      });
+    } finally {
+      setIsAddingData(false);
+    }
+  };
+
+  const handleCSVUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setIsUploadingCSV(true);
+    setDataFeedback({ type: null, message: '' });
+    try {
+      const res = await uploadAdminModelDataset(activeModelId, file);
+      if (res.success) {
+        setModels(prev => prev.map(m => {
+          if (m.model_id === activeModelId) {
+            return {
+              ...m,
+              total_samples: res.new_total_records
+            };
+          }
+          return m;
+        }));
+        setDataFeedback({
+          type: 'success',
+          message: `Dataset file "${res.filename}" ingested (+${res.uploaded_rows.toLocaleString()} records). Total training pool expanded to ${res.new_total_records.toLocaleString()} records.`
+        });
+      }
+    } catch (err: any) {
+      setDataFeedback({
+        type: 'error',
+        message: err?.response?.data?.detail || 'Failed to parse uploaded CSV dataset.'
+      });
+    } finally {
+      setIsUploadingCSV(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
 
   // Handlers for training
   const handleTrainActiveModel = async () => {
@@ -355,6 +435,90 @@ export const AdminModelsPage: React.FC = () => {
           </div>
         </div>
 
+        {/* Dataset Ingestion & Data Expansion Section */}
+        <div className="bg-slate-950/60 rounded-2xl p-4 border border-teal-800/40 space-y-3">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-teal-900/40 pb-2">
+            <div className="flex items-center gap-2">
+              <Database className="h-4 w-4 text-emerald-400" />
+              <span className="text-xs font-bold text-teal-200 uppercase tracking-wider">
+                Ingest More Clinical Data & Expand Training Pool
+              </span>
+            </div>
+            <span className="text-[11px] font-mono text-teal-300/80">
+              Active Dataset Pool: <strong className="text-white font-bold">{liveTotalDataset}</strong> Records
+            </span>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-[11px] font-bold text-slate-400">Quick Ingest:</span>
+            {[1000, 5000, 10000, 25000].map(cnt => (
+              <button
+                key={cnt}
+                type="button"
+                disabled={isAddingData || isUploadingCSV}
+                onClick={() => handleAddMoreData(cnt)}
+                className="px-2.5 py-1.5 rounded-lg bg-teal-900/40 hover:bg-teal-800/60 text-teal-200 border border-teal-700/50 text-[11px] font-bold transition flex items-center gap-1 disabled:opacity-50"
+              >
+                <PlusCircle className="h-3 w-3 text-emerald-400" />
+                +{cnt.toLocaleString()}
+              </button>
+            ))}
+
+            <div className="flex items-center gap-1.5 ml-auto">
+              <input
+                type="file"
+                ref={fileInputRef}
+                accept=".csv"
+                onChange={handleCSVUpload}
+                className="hidden"
+              />
+              <button
+                type="button"
+                disabled={isAddingData || isUploadingCSV}
+                onClick={() => fileInputRef.current?.click()}
+                className="px-3 py-1.5 rounded-lg bg-emerald-950/60 hover:bg-emerald-900/60 text-emerald-300 border border-emerald-600/50 text-[11px] font-bold transition flex items-center gap-1.5 disabled:opacity-50"
+              >
+                {isUploadingCSV ? (
+                  <>
+                    <Loader2 className="h-3 w-3 animate-spin text-emerald-300" />
+                    Uploading...
+                  </>
+                ) : (
+                  <>
+                    <UploadCloud className="h-3.5 w-3.5 text-emerald-400" />
+                    Upload Custom CSV (.csv)
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+
+          {/* Feedback for adding data */}
+          {dataFeedback.type && (
+            <div className={`p-2.5 rounded-xl border flex items-center justify-between text-xs ${
+              dataFeedback.type === 'success'
+                ? 'bg-emerald-950/80 border-emerald-500/60 text-emerald-200'
+                : 'bg-rose-950/80 border-rose-500/60 text-rose-200'
+            }`}>
+              <div className="flex items-center gap-2">
+                {dataFeedback.type === 'success' ? (
+                  <CheckCircle2 className="h-4 w-4 text-emerald-400 flex-shrink-0" />
+                ) : (
+                  <AlertCircle className="h-4 w-4 text-rose-400 flex-shrink-0" />
+                )}
+                <span className="font-medium">{dataFeedback.message}</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setDataFeedback({ type: null, message: '' })}
+                className="text-slate-400 hover:text-white text-[10px] uppercase font-bold"
+              >
+                Dismiss
+              </button>
+            </div>
+          )}
+        </div>
+
         {/* Retraining Controls Grid */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-5 items-center">
           {/* Sample Size Selector (7 Cols) */}
@@ -369,7 +533,7 @@ export const AdminModelsPage: React.FC = () => {
                 { label: '10,000', value: 10000, desc: 'Prototype' },
                 { label: '25,000', value: 25000, desc: 'Balanced' },
                 { label: '50,000', value: 50000, desc: 'High Vol' },
-                { label: 'Full Data', value: null, desc: 'Max Accuracy' },
+                { label: 'Full Data', value: null, desc: `~${liveTotalDataset}` },
               ].map(opt => (
                 <button
                   key={opt.label}
@@ -387,7 +551,7 @@ export const AdminModelsPage: React.FC = () => {
               ))}
             </div>
             <div className="flex items-center justify-between text-[11px] text-teal-200/70 pt-1">
-              <span>Selected Target: <strong className="text-white">{selectedSampleSize ? `${selectedSampleSize.toLocaleString()} records` : `Full Dataset (~${activeSpec.max_records.toLocaleString()} records)`}</strong></span>
+              <span>Selected Target: <strong className="text-white">{selectedSampleSize ? `${selectedSampleSize.toLocaleString()} records` : `Full Dataset (~${liveTotalDataset} records)`}</strong></span>
               <span className="font-mono text-emerald-300">Stratified 70/15/15 Split</span>
             </div>
           </div>

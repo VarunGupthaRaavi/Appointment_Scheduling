@@ -28,21 +28,9 @@ async def predict_diabetes(payload: DiabetesPredictionInput, request: Request):
         raw_pred = int(pipeline.predict(input_df)[0])
         raw_proba = pipeline.predict_proba(input_df)[0]
         
-        glucose = float(payload.blood_glucose_level or 140)
-        hba1c = float(payload.hbA1c_level or 6.5)
-        bmi = float(payload.bmi or 26.5)
-        
-        glucose_norm = min(max((glucose - 70.0) / (250.0 - 70.0), 0.0), 1.0)
-        hba1c_norm = min(max((hba1c - 4.5) / (11.0 - 4.5), 0.0), 1.0)
-        bmi_norm = min(max((bmi - 18.5) / (40.0 - 18.5), 0.0), 1.0)
-        
-        continuous_prob = 0.08 + (0.42 * glucose_norm) + (0.38 * hba1c_norm) + (0.10 * bmi_norm)
-        if payload.hypertension == 1:
-            continuous_prob += 0.05
-        if payload.heart_disease == 1:
-            continuous_prob += 0.05
-
-        calibrated_prob = round(min(max(continuous_prob, 0.08), 0.94), 4)
+        # Use accurate XGBoost machine learning model predicted probability
+        model_prob = float(raw_proba[1]) if len(raw_proba) > 1 else float(raw_proba[0])
+        calibrated_prob = round(float(model_prob), 4)
 
         risk_cat, guidance = derive_diabetes_risk_category(raw_pred, calibrated_prob)
         meta = MODEL_REGISTRY[model_id]

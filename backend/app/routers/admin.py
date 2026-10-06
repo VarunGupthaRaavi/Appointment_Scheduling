@@ -1,12 +1,17 @@
+import io
 import datetime
 from typing import Optional, Dict, Any, List
+import pandas as pd
 from pydantic import BaseModel, Field
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, UploadFile, File
 
 from app.ml.model_registry import MODEL_REGISTRY
 from app.ml.model_loader import model_loader
 from app.ml.research_engine import evaluate_demographic_fairness
-from app.ml.training_service import train_single_model, train_all_models
+from app.ml.training_service import (
+    train_single_model, train_all_models,
+    normalize_model_id, add_model_data
+)
 from app.routers.appointments import APPOINTMENTS_DB
 
 router = APIRouter(prefix="/admin", tags=["Admin Operations"])
@@ -19,6 +24,16 @@ class TrainModelRequest(BaseModel):
     optimize: bool = Field(
         default=True,
         description="Whether to execute multi-threaded tree ensemble optimization."
+    )
+
+class AddDataRequest(BaseModel):
+    records_count: Optional[int] = Field(
+        default=5000,
+        description="Number of clinical records to generate and ingest into training pool."
+    )
+    custom_records: Optional[List[Dict[str, Any]]] = Field(
+        default=None,
+        description="Optional list of custom clinical records in JSON format."
     )
 
 @router.get("/models")
@@ -69,6 +84,8 @@ async def get_admin_models_dashboard():
     }
 
 @router.post("/models/{model_id}/train")
+@router.post("/models/{model_id}/retrain")
+@router.post("/models/{model_id}/train-optimize")
 async def train_model_endpoint(model_id: str, payload: Optional[TrainModelRequest] = None):
     """
     Trains and optimizes a specific production machine learning model from the frontend.
@@ -77,26 +94,82 @@ async def train_model_endpoint(model_id: str, payload: Optional[TrainModelReques
     sample_size = payload.sample_size if payload else None
     optimize = payload.optimize if payload else True
 
+    norm_id = normalize_model_id(model_id)
     valid_models = ["diabetes_risk", "appointment_noshow", "appointment_reservation", "hospital_readmission"]
-    if model_id not in valid_models:
+    if norm_id not in valid_models:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Model '{model_id}' not found. Valid models: {valid_models}"
+            detail=f"Model '{model_id}' (resolved: '{norm_id}') not found. Valid models: {valid_models}"
         )
 
     try:
-        result = train_single_model(model_id, sample_size=sample_size, optimize=optimize)
+        result = train_single_model(norm_id, sample_size=sample_size, optimize=optimize)
         return {
             "success": True,
             "message": f"Successfully trained and optimized {result['model_name']} ({result['algorithm']}) on {result['total_dataset_used']:,} records.",
-            "model_id": model_id,
+            "model_id": norm_id,
             "result": result
         }
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to train model '{model_id}': {str(e)}"
+            detail=f"Failed to train model '{norm_id}': {str(e)}"
         )
+
+@router.post("/models/{model_id}/add-data")
+async def add_model_data_endpoint(model_id: str, payload: Optional[AddDataRequest] = None):
+    """
+    Ingests additional clinical records into the model's dataset pool.
+    Expands total dataset capacity and allows subsequent retraining on the enlarged dataset.
+    """
+    norm_id = normalize_model_id(model_id)
+    valid_models = ["diabetes_risk", "appointment_noshow", "appointment_reservation", "hospital_readmission"]
+    if norm_id not in valid_models:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Model '{model_id}' (resolved: '{norm_id}') not found. Valid models: {valid_models}"
+        )
+
+    records_count = payload.records_count if payload else 5000
+    custom_records = payload.custom_records if payload else None
+
+    try:
+        result = add_model_data(norm_id, records_count=records_count, custom_records=custom_records)
+        return result
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to ingest clinical records for model '{norm_id}': {str(e)}"
+        )
+
+@router.post("/models/{model_id}/upload-dataset")
+async def upload_dataset_endpoint(model_id: str, file: UploadFile = File(...)):
+    """
+    Uploads a custom CSV dataset file to expand the training pool for the specified model.
+    """
+    norm_id = normalize_model_id(model_id)
+    valid_models = ["diabetes_risk", "appointment_noshow", "appointment_reservation", "hospital_readmission"]
+    if norm_id not in valid_models:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Model '{model_id}' (resolved: '{norm_id}') not found. Valid models: {valid_models}"
+        )
+
+    try:
+        content = await file.read()
+        df = pd.read_csv(io.BytesIO(content))
+        result = add_model_data(norm_id, file_df=df)
+        return {
+            **result,
+            "filename": file.filename,
+            "uploaded_rows": len(df)
+        }
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Failed to parse uploaded CSV dataset: {str(e)}"
+        )
+
 
 @router.post("/models/train-all")
 async def train_all_models_endpoint(payload: Optional[TrainModelRequest] = None):

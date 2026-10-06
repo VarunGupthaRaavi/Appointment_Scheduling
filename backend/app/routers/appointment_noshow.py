@@ -29,16 +29,18 @@ async def predict_noshow(payload: AppointmentNoShowInput, request: Request):
     try:
         raw_pred = int(pipeline.predict(input_df)[0])
         raw_proba = pipeline.predict_proba(input_df)[0]
-        pos_prob = float(raw_proba[1]) if len(raw_proba) > 1 else float(raw_proba[0])
+        # Class 0 = Missed appointment (No-Show), Class 1 = Attended appointment
+        noshow_prob = float(raw_proba[0]) if len(raw_proba) > 1 else float(1.0 - raw_proba[0])
+        attend_prob = float(raw_proba[1]) if len(raw_proba) > 1 else float(raw_proba[0])
         
-        risk_cat, guidance = derive_noshow_risk_category(raw_pred, pos_prob)
+        risk_cat, guidance = derive_noshow_risk_category(raw_pred, attend_prob)
         meta = MODEL_REGISTRY[model_id]
 
-        label = "Attended Appointment" if raw_pred == 1 else "No-Show Expected"
+        label = "Likely No-Show" if noshow_prob >= 0.50 else "Likely Attendance"
 
         # Research Engine Outputs
-        conformal_bounds = compute_conformal_interval(pos_prob)
-        counterfactual_plan = generate_counterfactual_recourse(model_id, input_data, pos_prob)
+        conformal_bounds = compute_conformal_interval(noshow_prob)
+        counterfactual_plan = generate_counterfactual_recourse(model_id, input_data, noshow_prob)
 
         return PredictionResponse(
             success=True,
@@ -47,9 +49,9 @@ async def predict_noshow(payload: AppointmentNoShowInput, request: Request):
             model_name=meta["model_name"],
             algorithm=meta["algorithm"],
             model_version=meta["version"],
-            prediction=raw_pred,
+            prediction=1 if noshow_prob >= 0.50 else 0,
             prediction_label=label,
-            probability=round(pos_prob, 4),
+            probability=round(noshow_prob, 4),
             probabilities=[round(float(p), 4) for p in raw_proba],
             risk_category=risk_cat,
             clinical_guidance=guidance,

@@ -56,7 +56,32 @@ export const trainAdminModel = async (
   modelId: string,
   payload?: { sample_size?: number | null; optimize?: boolean }
 ) => {
-  const res = await apiClient.post(`/admin/models/${modelId}/train`, payload || {});
+  const cleanId = modelId.replace(/-/g, '_');
+  const res = await apiClient.post(`/admin/models/${cleanId}/train`, payload || {});
+  return res.data;
+};
+
+export const addAdminModelData = async (
+  modelId: string,
+  payload?: { records_count?: number; custom_records?: any[] }
+) => {
+  const cleanId = modelId.replace(/-/g, '_');
+  const res = await apiClient.post(`/admin/models/${cleanId}/add-data`, payload || { records_count: 5000 });
+  return res.data;
+};
+
+export const uploadAdminModelDataset = async (
+  modelId: string,
+  file: File
+) => {
+  const cleanId = modelId.replace(/-/g, '_');
+  const formData = new FormData();
+  formData.append('file', file);
+  const res = await apiClient.post(`/admin/models/${cleanId}/upload-dataset`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
   return res.data;
 };
 

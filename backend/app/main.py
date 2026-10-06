@@ -54,17 +54,20 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Register API Routers under /api/v1
+# Register API Routers across /api/v1, /api, and root prefixes for universal client routing compatibility
+api_routers = [
+    health.router, auth.router, diabetes.router,
+    appointment_noshow.router, appointment_reservation.router,
+    readmission.router, patient_analyze.router,
+    appointments.router, admin.router
+]
+
 api_prefix = settings.API_V1_STR
-app.include_router(health.router, prefix=api_prefix)
-app.include_router(auth.router, prefix=api_prefix)
-app.include_router(diabetes.router, prefix=api_prefix)
-app.include_router(appointment_noshow.router, prefix=api_prefix)
-app.include_router(appointment_reservation.router, prefix=api_prefix)
-app.include_router(readmission.router, prefix=api_prefix)
-app.include_router(patient_analyze.router, prefix=api_prefix)
-app.include_router(appointments.router, prefix=api_prefix)
-app.include_router(admin.router, prefix=api_prefix)
+for r in api_routers:
+    app.include_router(r, prefix=api_prefix)
+    app.include_router(r, prefix="/api")
+    app.include_router(r)
+
 
 @app.api_route("/", methods=["GET", "HEAD"])
 async def root():

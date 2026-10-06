@@ -51,30 +51,38 @@ export const PredictPage: React.FC = () => {
   });
 
   // Preset Test Fillers for Admin Sandbox Verification
-  const loadModelPreset = (modelType: string, scenario: 'high' | 'low') => {
+  const loadModelPreset = (modelType: string, scenario: 'high' | 'moderate' | 'low') => {
     if (modelType === 'diabetes') {
       if (scenario === 'high') {
-        setDiabetesForm({ ...diabetesForm, age: 64, bmi: 35.2, hbA1c_level: 8.8, blood_glucose_level: 220, hypertension: 1, heart_disease: 1 });
+        setDiabetesForm({ ...diabetesForm, age: 66, bmi: 36.8, hbA1c_level: 9.2, blood_glucose_level: 245, hypertension: 1, heart_disease: 1 });
+      } else if (scenario === 'moderate') {
+        setDiabetesForm({ ...diabetesForm, age: 48, bmi: 28.2, hbA1c_level: 6.2, blood_glucose_level: 140, hypertension: 0, heart_disease: 0 });
       } else {
-        setDiabetesForm({ ...diabetesForm, age: 26, bmi: 21.0, hbA1c_level: 5.1, blood_glucose_level: 90, hypertension: 0, heart_disease: 0 });
+        setDiabetesForm({ ...diabetesForm, age: 24, bmi: 20.8, hbA1c_level: 5.0, blood_glucose_level: 88, hypertension: 0, heart_disease: 0 });
       }
     } else if (modelType === 'noshow') {
       if (scenario === 'high') {
-        setNoshowForm({ ...noshowForm, lead_time_days: 45, SMS_received: 0, Age: 22 });
+        setNoshowForm({ ...noshowForm, lead_time_days: 65, SMS_received: 0, Age: 21, Scholarship: 1, Hipertension: 0 });
+      } else if (scenario === 'moderate') {
+        setNoshowForm({ ...noshowForm, lead_time_days: 14, SMS_received: 1, Age: 38, Scholarship: 0, Hipertension: 0 });
       } else {
-        setNoshowForm({ ...noshowForm, lead_time_days: 2, SMS_received: 1, Age: 55 });
+        setNoshowForm({ ...noshowForm, lead_time_days: 1, SMS_received: 1, Age: 62, Scholarship: 0, Hipertension: 1 });
       }
     } else if (modelType === 'reservation') {
       if (scenario === 'high') {
-        setReservationForm({ ...reservationForm, latencia: 30.0, especialidad: 76.0 });
+        setReservationForm({ ...reservationForm, latencia: 42.0, especialidad: 76.0, edad: 28.0 });
+      } else if (scenario === 'moderate') {
+        setReservationForm({ ...reservationForm, latencia: 10.0, especialidad: 34.0, edad: 45.0 });
       } else {
-        setReservationForm({ ...reservationForm, latencia: 2.0, especialidad: 12.0 });
+        setReservationForm({ ...reservationForm, latencia: 1.0, especialidad: 12.0, edad: 60.0 });
       }
     } else if (modelType === 'readmission') {
       if (scenario === 'high') {
-        setReadmissionForm({ ...readmissionForm, time_in_hospital: 10, number_inpatient: 3, num_medications: 25, A1Cresult: '>8' });
+        setReadmissionForm({ ...readmissionForm, time_in_hospital: 12, number_inpatient: 4, num_medications: 28, A1Cresult: '>8', number_diagnoses: 9 });
+      } else if (scenario === 'moderate') {
+        setReadmissionForm({ ...readmissionForm, time_in_hospital: 5, number_inpatient: 1, num_medications: 14, A1Cresult: '>7', number_diagnoses: 5 });
       } else {
-        setReadmissionForm({ ...readmissionForm, time_in_hospital: 1, number_inpatient: 0, num_medications: 5, A1Cresult: 'Norm' });
+        setReadmissionForm({ ...readmissionForm, time_in_hospital: 1, number_inpatient: 0, num_medications: 4, A1Cresult: 'Norm', number_diagnoses: 2 });
       }
     }
   };
@@ -148,6 +156,12 @@ ReqID: ${result.request_id}`;
             className="px-3 py-1 rounded-xl bg-rose-50 text-rose-700 text-xs font-bold border border-rose-200 hover:bg-rose-100 transition-colors"
           >
             Load High Risk Case
+          </button>
+          <button
+            onClick={() => loadModelPreset(activeTab, 'moderate')}
+            className="px-3 py-1 rounded-xl bg-amber-50 text-amber-700 text-xs font-bold border border-amber-200 hover:bg-amber-100 transition-colors"
+          >
+            Load Moderate Case
           </button>
           <button
             onClick={() => loadModelPreset(activeTab, 'low')}
@@ -441,15 +455,23 @@ ReqID: ${result.request_id}`;
               {/* EXPLICIT AI PREDICTABILITY CONFIDENCE SCORE */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="rounded-2xl bg-slate-50 p-3 text-center border border-slate-100">
-                  <div className="text-[10px] font-bold text-slate-400 uppercase">Model Confidence</div>
+                  <div className="text-[10px] font-bold text-slate-400 uppercase">Model Probability</div>
                   <div className="text-lg font-black text-slate-900">
-                    {result.probability ? (result.probability * 100).toFixed(1) + '%' : '94.8%'}
+                    {result.probability !== undefined 
+                      ? ((result.probability * 100) % 1 === 0 
+                          ? (result.probability * 100).toFixed(0) + '%' 
+                          : (result.probability * 100).toFixed(1) + '%') 
+                      : 'N/A'}
                   </div>
                 </div>
 
                 <div className="rounded-2xl bg-slate-50 p-3 text-center border border-slate-100">
-                  <div className="text-[10px] font-bold text-slate-400 uppercase">Predictability Index</div>
-                  <div className="text-lg font-black text-teal-700">Verified High</div>
+                  <div className="text-[10px] font-bold text-slate-400 uppercase">Decision Certainty</div>
+                  <div className="text-lg font-black text-teal-700">
+                    {result.probability !== undefined
+                      ? (Math.max(result.probability, 1.0 - result.probability) * 100).toFixed(1) + '%'
+                      : 'Verified'}
+                  </div>
                 </div>
               </div>
 
